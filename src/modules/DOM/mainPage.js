@@ -1,10 +1,15 @@
+import { columnsRender } from './columns'
+
 let content = document.getElementById("content");
 
-let pageRender = function(){
-    //Render main section
-    let mainDiv = document.createElement("div")
-    mainDiv.setAttribute("id", "mainDiv")
-    content.appendChild(mainDiv)
+function mainRender(){
+        
+        //Renders the main section
+        let mainDiv = document.createElement("div")
+        mainDiv.setAttribute("id", "mainDiv")
+        content.appendChild(mainDiv)
+        //Renders button to create new columns
+        columnsRender().newColumnBtn();
 
 
 }
@@ -38,6 +43,7 @@ function sideRender(){
             newProjectBtn.innerHTML = "+"
             newProjectBtn.setAttribute("class", "projectDiv newProject")
             newProjectBtn.addEventListener('click', function() {
+                //Add New Project
                 let newProjectDiv = document.createElement("div")
                 newProjectDiv.setAttribute("class", "projectDiv")
                 //addDivId
@@ -45,10 +51,9 @@ function sideRender(){
                 sideDivBottom.appendChild(newProjectDiv)
             })
             sideDivBottom.appendChild(newProjectBtn)
-                //Add "On Click run function"
 
 }
 
 
 
-export { pageRender, sideRender }
+export { mainRender, sideRender }

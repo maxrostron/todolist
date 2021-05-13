@@ -1,7 +1,7 @@
-import { pageRender, sideRender } from './modules/DOM/mainPage'
+import { mainRender, sideRender } from './modules/DOM/mainPage'
 
 let render = (function () {
-    pageRender();
+    mainRender();
     sideRender();
 })();
 
