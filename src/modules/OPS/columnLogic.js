@@ -1,18 +1,34 @@
-function columnLogic() {
-    let columnObjects = []
-    let noColumns = columnObjects.length
 
+let columnObject = {
 
-
-    return {
-        create() {
-            let newColumn = {
-                id: noColumns,
-            }
-            columnObjects.push(newColumn)
+    objects: [],
+    create: function(){
+        let column = {
+            id: "col" + this.objects.length,
+            title: "",
+            type: "column",
+            tasks: []
         }
+        columnObject.objects.push(column)
+    },
+    search: function(idKey, myArray){
+        for (var i=0; i < myArray.length; i++) {
+            if (myArray[i].id === idKey) {
+                return myArray[i];
+            }
+        }
+    },
+    update: function(columnID, newColumnTitle){
+        let objectToUpdate = columnObject.search(`${columnID}`, columnObject.objects)
 
-    }
-}
+        objectToUpdate.title = newColumnTitle
+        console.log("test")
+        console.log(objectToUpdate.title)
+        console.log(columnObject.objects)
 
-export { columnLogic }
+    },
+
+};
+
+export { columnObject }
+

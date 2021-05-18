@@ -9,7 +9,7 @@ function mainRender(){
         mainDiv.setAttribute("id", "mainDiv")
         content.appendChild(mainDiv)
         //Renders button to create new columns
-        columnsRender().newColumnBtn();
+        columnsRender.newColumnBtn();
 
 
 }
