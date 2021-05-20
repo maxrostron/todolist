@@ -1,6 +1,8 @@
 import { taskObject } from '../OPS/taskLogic.js'
 import flag from '/home/maxrostron/todolist/src/modules/IMG/flags.png'
 import pencil from '/home/maxrostron/todolist/src/modules/IMG/pencil.png'
+import bin from '/home/maxrostron/todolist/src/modules/IMG/delete.png'
+import { projectObject } from '/home/maxrostron/todolist/src/modules/OPS/projectLogic.js'
 
 
 let tasksRender = (function () {
@@ -8,6 +10,7 @@ let tasksRender = (function () {
     let currentTaskDIV = ""
     let relevantColumnBody 
     let formData
+    let test
     return {
     newTaskBtn(columnID) {
         //Add New Task Button
@@ -16,10 +19,12 @@ let tasksRender = (function () {
         let newTaskBtn = document.createElement("div")
         newTaskBtn.setAttribute("class", "newTaskBtn")
         newTaskBtn.addEventListener('click', function () {
-            tasksRender.newTaskWindow()
+            console.log("column")
+            tasksRender.newTaskWindow(columnID)
+            test = this.parentElement.parentElement.id
         })
         tasksRender.relevantColumnBody.appendChild(newTaskBtn)
-
+        
         //Renders text for New Task Button
         let newTaskBtnText = document.createElement("h1")
         newTaskBtnText.innerHTML = "+"
@@ -30,7 +35,10 @@ let tasksRender = (function () {
         //Create pop-up window
         let window = document.createElement("div")
         window.setAttribute("class", "popWindow")
-        document.getElementById("mainDiv").appendChild(window)
+        console.log("preID")
+        console.log(preID)
+        let mainProjDiv = document.getElementById(preID).parentElement
+        document.getElementById("content").appendChild(window)
 
         //Create Form
         let form = document.createElement("form");
@@ -46,7 +54,7 @@ let tasksRender = (function () {
         closeFormBtn.id = "closeFormBtn"
         closeFormBtn.textContent = "x"
         closeFormBtn.addEventListener('click', function(){
-            window.style.display = "none"
+            window.remove()
         })
         form.appendChild(closeFormBtn)
 
@@ -92,7 +100,7 @@ let tasksRender = (function () {
                 //Add Completed Option
                 let completed = document.createElement("option")
                 completed.value = "completed"
-                let completedText = document.createTextNode("completed")
+                let completedText = document.createTextNode("Completed")
                 completed.appendChild(completedText)
                 taskStatus.appendChild(completed)
 
@@ -201,20 +209,32 @@ let tasksRender = (function () {
         }
 
         form.appendChild(submitBtn)
+        console.log(projectObject.objects)
     },
     addNewTaskDiv(title, description, status, priority, date) {
         // Creates new object & adds to column
-        taskObject.create(tasksRender.currentColumnID, title, description, status, priority, date)
+        taskObject.create(test, title, description, status, priority, date)
         let taskID = "task" + (taskObject.objects.length - 1)
         //Creates DOM Elements
         let newTask = document.createElement("div")
         newTask.setAttribute("class", "newTask")
         newTask.setAttribute("id", taskID)
-        tasksRender.relevantColumnBody.appendChild(newTask)
+        let appendToColumn = document.getElementById(test).querySelector('.columnBody')
+        appendToColumn.appendChild(newTask)
             //Task Colour Code
             let newTaskColor = document.createElement("div")
             newTaskColor.setAttribute("class", "taskColor")
             newTask.appendChild(newTaskColor)
+                //Set Colour
+                if(status == "notStarted"){
+                    newTaskColor.setAttribute("class", "taskColor notStarted")
+                }
+                else if (status == "inProgress"){
+                    newTaskColor.setAttribute("class", "taskColor inProgress")
+                }
+                else if (status == "completed"){
+                    newTaskColor.setAttribute("class", "taskColor completed")
+                }  
             //Task Content Area
             let taskContentArea = document.createElement("div")
             taskContentArea.setAttribute("class", "taskContentArea")
@@ -230,6 +250,16 @@ let tasksRender = (function () {
         })
         newTask.appendChild(editPencil)
         currentTaskDIV = taskID
+        //Create Delete Task
+        let deleteTask = document.createElement("img")
+        deleteTask.id = taskID + "edit"
+        deleteTask.setAttribute("class", "deleteTask")
+        deleteTask.src = bin
+        deleteTask.addEventListener('click', function(){
+            taskObject.deleteObject(this.parentElement)
+        })
+        newTask.appendChild(deleteTask)
+
     },
     updateTaskDOM(update, id, title, description, status, priority, date){
         if(update == false){
@@ -270,6 +300,7 @@ let tasksRender = (function () {
             })
             taskDetailsLower.appendChild(taskPriorityDOM)
             taskPriorityDOM.appendChild(taskFlagDOM)
+ 
         }
         else if (update == true){
             let divTitleToUpdate = document.getElementById(id).querySelector(".taskTitle")
@@ -300,10 +331,25 @@ let tasksRender = (function () {
                 taskObject.changePriority(this.parentElement.parentElement.parentElement.id)
             })
 
-        }
+            let divStatusToUpdate = document.getElementById(id).querySelector(".taskColor")
 
+            divStatusToUpdate.removeAttribute("class")
+            divTitleToUpdate.removeAttribute("class")
+            //Set Colour
+            if(status == "notStarted"){
+                divStatusToUpdate.setAttribute("class", "taskColor notStarted")
+                divTitleToUpdate.setAttribute("class", "taskTitle")
+            }
+            else if (status == "inProgress"){
+                divStatusToUpdate.setAttribute("class", "taskColor inProgress")
+                divTitleToUpdate.setAttribute("class", "taskTitle")
+            }
+            else if (status == "completed"){
+                divStatusToUpdate.setAttribute("class", "taskColor completed")
+                divTitleToUpdate.setAttribute("class", "taskTitle strikethrough")
+            } 
 
-            
+        }   
     },
     toggleHighPriority(taskDiv) {
         let targetDiv = document.getElementById(taskDiv)
@@ -326,6 +372,104 @@ let tasksRender = (function () {
 
         targetDivPriorityDOM.setAttribute("class", "flag lowPriorityBox")
         targetDivFlagDOM.setAttribute("class", "taskFlag lowPriorityFlag")   
+    },
+    divToDelete(div){
+        div.remove()
+    },
+    loadTasks(taskArrayToLoad, columnID){
+
+        for(let i = 0; i < taskArrayToLoad.length; i++){
+
+        //Creates DOM Elements
+        let newTask = document.createElement("div")
+        newTask.setAttribute("class", "newTask")
+        newTask.setAttribute("id", taskArrayToLoad[i].id)
+        let appendToColumn = document.getElementById(columnID).querySelector('.columnBody')
+        appendToColumn.appendChild(newTask)
+            //Task Colour Code
+            let newTaskColor = document.createElement("div")
+            newTaskColor.setAttribute("class", "taskColor")
+            newTask.appendChild(newTaskColor)
+                //Set Colour
+                if(taskArrayToLoad[i].status == "notStarted"){
+                    newTaskColor.setAttribute("class", "taskColor notStarted")
+                }
+                else if (taskArrayToLoad[i].status == "inProgress"){
+                    newTaskColor.setAttribute("class", "taskColor inProgress")
+                }
+                else if (taskArrayToLoad[i].status == "completed"){
+                    newTaskColor.setAttribute("class", "taskColor completed")
+                }  
+            //Task Content Area
+            let taskContentArea = document.createElement("div")
+            taskContentArea.setAttribute("class", "taskContentArea")
+            newTask.appendChild(taskContentArea)
+        //Create Edit Pencil
+        let editPencil = document.createElement("img")
+        editPencil.id = taskArrayToLoad[i].id + "edit"
+        editPencil.setAttribute("class", "editPencil")
+        editPencil.src = pencil
+        //Enables edit task feature
+        editPencil.addEventListener('click', function(){
+            taskObject.openEdit(this.parentElement)
+        })
+        newTask.appendChild(editPencil)
+        currentTaskDIV = taskArrayToLoad[i].id
+        //Create Delete Task
+        let deleteTask = document.createElement("img")
+        deleteTask.id = taskArrayToLoad[i].id + "edit"
+        deleteTask.setAttribute("class", "deleteTask")
+        deleteTask.src = bin
+        deleteTask.addEventListener('click', function(){
+            taskObject.deleteObject(this.parentElement)
+        })
+
+        //Create Upper Task Dom
+        let taskDetailsUpper = document.createElement("div")
+        taskDetailsUpper.setAttribute("class", "taskDetailsUpper")
+        document.getElementById(taskArrayToLoad[i].id).querySelector(".taskContentArea").appendChild(taskDetailsUpper)
+
+        //Create Lower Task Dom
+        let taskDetailsLower = document.createElement("div")
+        taskDetailsLower.setAttribute("class", "taskDetailsLower")
+        document.getElementById(taskArrayToLoad[i].id).querySelector(".taskContentArea").appendChild(taskDetailsLower)
+
+        //Create taskTitle
+        let taskTitleDOM = document.createElement("h1")
+        taskTitleDOM.setAttribute("class", "taskTitle")
+        taskTitleDOM.innerHTML = taskArrayToLoad[i].title
+        taskDetailsUpper.appendChild(taskTitleDOM)
+
+        //Create taskDate
+        let taskDateDOM = document.createElement("h2")
+        taskDateDOM.setAttribute("class", "taskDate")
+        taskDateDOM.innerHTML = taskArrayToLoad[i].date
+        taskDetailsLower.appendChild(taskDateDOM)
+
+        //Add priority DOM
+        let taskPriorityDOM = document.createElement("div")
+        let taskFlagDOM = document.createElement("img")
+        taskFlagDOM.id = currentTaskDIV + "flag"
+
+        taskFlagDOM.src = flag
+            if(taskArrayToLoad[i].priority == "highPriority") {
+                taskPriorityDOM.setAttribute("class", "flag highPriorityBox")
+                taskFlagDOM.setAttribute("class", "taskFlag highPriorityFlag")
+            } 
+            else if(taskArrayToLoad[i].priority == "lowPriority") {
+                taskPriorityDOM.setAttribute("class", "flag lowPriorityBox")
+                taskFlagDOM.setAttribute("class", "taskFlag lowPriorityFlag")
+            }
+        taskPriorityDOM.addEventListener("click", function(){
+            taskObject.changePriority(this.parentElement.parentElement.parentElement.id)
+        })
+        taskDetailsLower.appendChild(taskPriorityDOM)
+        taskPriorityDOM.appendChild(taskFlagDOM)
+
+        newTask.appendChild(deleteTask)
+
+        }
+
     }
 }     
 })();
@@ -335,8 +479,6 @@ export { tasksRender }
 
 
 //Need to be able to move tasks between columns, and move columns left right - draggable would be cool
-
-//Need to be able to color columns
 
 //Need to assign columns to projects level
 

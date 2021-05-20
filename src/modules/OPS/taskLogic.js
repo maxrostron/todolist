@@ -1,5 +1,6 @@
 import { columnObject } from '../OPS/columnLogic.js'
 import { tasksRender } from '../DOM/tasks'
+import {saveProjects} from '/home/maxrostron/todolist/src/modules/OPS/storage.js'
 
 let taskObject = {
 
@@ -16,13 +17,12 @@ let taskObject = {
             priority: priority,
             date: date
         }
-
         let column = columnObject.objects.find(
             ({ id }) => id === columnID
         )
         column.tasks.push(task)
         this.objects.push(task)
-
+        saveProjects()
     },
     search: function(idKey, myArray){
             for (var i=0; i < myArray.length; i++) {
@@ -42,7 +42,7 @@ let taskObject = {
         let preDate = objectToUpdate.date
 
         tasksRender.newTaskWindow(preID, preTitle, preDescription, preStatus, prePriority, preDate)
-
+        saveProjects()
     },
     updateObject: function(id, title, description, status, priority, date){
         let objectToUpdate = taskObject.search(`${id}`, taskObject.objects)
@@ -52,10 +52,12 @@ let taskObject = {
         objectToUpdate.status = status
         objectToUpdate.priority = priority
         objectToUpdate.date = date
+        saveProjects()
     },
     changePriority: function(taskDiv){
         let currentTask = taskDiv
         let objectToUpdate = taskObject.search(`${taskDiv}`, taskObject.objects)
+
         if(objectToUpdate.priority == "lowPriority"){
             objectToUpdate.priority = "highPriority"
             tasksRender.toggleHighPriority(currentTask)
@@ -64,6 +66,29 @@ let taskObject = {
             objectToUpdate.priority = "lowPriority"
             tasksRender.toggleLowPriority(currentTask)
         } 
+        saveProjects()
+    },
+    deleteObject: function(taskDiv){
+        let objectToUpdate = taskObject.search(`${taskDiv.id}`, taskObject.objects)
+        
+
+        tasksRender.divToDelete(taskDiv)
+
+        let objectIndex = taskObject.objects.indexOf(objectToUpdate)
+
+        for(let i=0; i < taskObject.objects.length; i++){
+            console.log(i)
+            if(i === objectIndex){
+                return taskObject.objects.splice(i, 1);
+            }
+        }
+        saveProjects()
+    },
+    deleteObjectColumn: function(columnID){
+        taskObject.objects = taskObject.objects.filter(
+            obj => obj.col !== `${columnID}`
+        )
+        saveProjects()
     }
 
     }
